@@ -11,11 +11,11 @@ export const signup=async (req,res)=>{
     try{
         const {fullName,username,password,confirmPassword,gender,profilePic}=req.body;
         if(password!=confirmPassword){
-            return res.status(400).json({message:"passwords do not match"});
+            return res.status(400).json({error:"passwords do not match"});
         }
         const user=await User.findOne({username});
         if(user){
-            return res.status(400).json({message:"username already exists"});
+            return res.status(400).json({error:"username already exists"});
         }
 
 
@@ -32,15 +32,19 @@ export const signup=async (req,res)=>{
         if(newUser){
              generateTokenandSetCookie(newUser._id,res);
             await newUser.save();
-            res.status(201).json({message:"user created successfully"});
-
+            res.status(201).json({
+				_id: newUser._id,
+				fullName: newUser.fullName,
+				username: newUser.username,
+				profilePic: newUser.profilePic,
+			});
         }
 
       
     }
     catch(err){
-        console.log("error creating user",err);
-        res.status(500).json({message:"internal server error"});
+        console.log("error creating user",err.message);
+        res.status(500).json({error:"internal server error"});
     
     }
 
@@ -54,17 +58,22 @@ export const login= async(req,res)=>{
         const user=await  User.findOne({username});
         const isPassword=await bycrptjs.compare(password,user?.password || "");
         if(!user || !isPassword){
-            return res.status(400).json({message:"invalid credentials"});
+            return res.status(400).json({error:"invalid credentials"});
         }
         generateTokenandSetCookie(user._id,res);
-        res.status(200).json({message:"login successfull"});
+        res.status(200).json({
+			_id: user._id,
+			fullName: user.fullName,
+			username: user.username,
+			profilePic: user.profilePic,
+		});
 
         
 
     }
     catch(error){
-        console.log("error logging in",error);
-        res.status(500).json({message:"internal server error"});
+        console.log("error logging in",error.message);
+        res.status(500).json({error:"internal server error"});
     
 
     }
@@ -85,7 +94,7 @@ export const logout= async (req,res)=>{
     }
     catch(error){
         console.log("error logging out",error);
-        res.status(500).json({message:"internal server error"});
+        res.status(500).json({error:"internal server error"});
 
     }
 
