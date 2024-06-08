@@ -10,7 +10,7 @@ export const getUsersForSidebar=async(req,res)=>{
 
     }
     catch(error){
-        console.log("error getting users for sidebar",error);
+        console.log("error getting users for sidebar",error.message);
         res.status(500).json("problem getting users for sidebar");
     }
 }

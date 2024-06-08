@@ -30,7 +30,7 @@ export const sendMessage=async(req,res)=>{
         await newMessage.save();
         await conversation.save();
          
-        res.status(200).json({message:"message sent",newMessage});
+        res.status(200).json(newMessage);
 
 
     }
@@ -49,6 +49,9 @@ export const getMessages=async(req,res)=>{
         const conversation=await Conversation.findOne({
             participants:{$all:[senderId,userTochatid]}
         }).populate("messages");
+        if(!conversation){
+            return res.status(200).json([]);
+        }
         res.status(200).json(conversation.messages);
     }   
     catch(error){
